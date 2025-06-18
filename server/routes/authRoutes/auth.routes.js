@@ -5,7 +5,15 @@ import {
   register,
   login,
   logout,
+  sendVerficationOtp,
+  verifyUser,
+  isAuthenticated,
+  sendResetOtp,
+  resetPassword,
 } from "../../controllers/authController/auth.controller.js";
+
+// middleware
+import { userAuth } from "../../middleware/auth.middleware.js";
 
 const authRouter = express.Router();
 
@@ -14,5 +22,12 @@ const authRouter = express.Router();
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
+
+authRouter.post("/send-verification-otp", userAuth, sendVerficationOtp);
+authRouter.post("/verify-user", userAuth, verifyUser);
+authRouter.post("/is-auth", userAuth, isAuthenticated);
+
+authRouter.post("/send-reset-otp", sendResetOtp);
+authRouter.post("/reset-password", resetPassword);
 
 export default authRouter;

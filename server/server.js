@@ -11,8 +11,10 @@ import authRouter from "./routes/authRoutes/auth.routes.js";
 
 const PORT = process.env.PORT || 4000;
 
+// Configuration
 connectDB();
 
+// Express App
 const app = express();
 
 // Middlewares
