@@ -25,7 +25,7 @@ const Header = () => {
         Let's start with a quick product tour and we will have you up and
         running in no time!
       </p>
-      <Button>Get Started</Button>
+      <Button className="btn">Get Started</Button>
     </header>
   );
 };
