@@ -51,7 +51,7 @@ export const register = async (req, res) => {
       .status(201)
       .json({ success: true, message: "User created in the database." });
   } catch (err) {
-    console.error("🔥 register controller error:", err);
+    console.error("register controller error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -126,7 +126,7 @@ export const logout = async (req, res) => {
 // send verification OTP to user's email
 export const sendVerficationOtp = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req;
     const user = await userModel.findById(userId);
 
     // user doesn't exist
@@ -157,9 +157,10 @@ export const sendVerficationOtp = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Verification OTP sent on user's email",
+      message: "Verification OTP sent on email",
     });
   } catch (err) {
+    console.error("sendVerificationOtp controller error:", err);
     res.status(500).json({
       success: false,
       message: err.message,

@@ -1,16 +1,16 @@
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "../store/user/user.selector";
-
 // assets
 import { assets } from "../assets/assets";
 
 // components
 import Button from "./Button";
 
+// custom hook
+import { useAuth } from "../customHooks/useAuth";
+
 const { header_img, hand_wave } = assets;
 
 const Header = () => {
-  const { name } = useSelector(selectCurrentUser);
+  const { isLoggedIn, currentUser } = useAuth();
 
   return (
     <header className="flex flex-col items-center mt-20 px-4 text-center text-gray-800">
@@ -21,7 +21,7 @@ const Header = () => {
       />
       <div className="flex items-center gap-2 mb-2">
         <h1 className="text-xl sm:text-3xl font-medium">
-          Hey {name ? name : "Developer"}
+          Hey {isLoggedIn ? currentUser.name : "Developer"}
         </h1>
         <img src={hand_wave} alt="wave-img" className="w-8 aspect-square" />
       </div>

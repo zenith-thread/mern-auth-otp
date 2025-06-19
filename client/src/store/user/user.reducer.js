@@ -5,6 +5,8 @@ import {
   registerUserInDatabase,
   loginUserWithEmailAndPassword,
   getUserData,
+  logoutUser,
+  sendVerificationOtp,
 } from "../../api/auth";
 
 export const statusTypes = {
@@ -28,7 +30,6 @@ export const registerUserAsync = createAsyncThunk(
       const { success } = await registerUserInDatabase(name, email, password);
       if (success) {
         const user = await getUserData();
-        console.log("INCOMING USER DATA: ", user);
         return user;
       }
     } catch (err) {
@@ -44,9 +45,31 @@ export const loginUserAsync = createAsyncThunk(
       const { success } = await loginUserWithEmailAndPassword(email, password);
       if (success) {
         const user = await getUserData();
-        console.log("INCOMING USER DATA: ", user);
         return user;
       }
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const logOutUserAsync = createAsyncThunk(
+  "user/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { success } = await logoutUser();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const sendVerificationOtpAsync = createAsyncThunk(
+  "user/verificationOtp",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { message } = await sendVerificationOtp();
+      return message;
     } catch (err) {
       return rejectWithValue(err.message);
     }
@@ -86,6 +109,30 @@ export const userSlice = createSlice({
         state.currentUser = action.payload;
       })
       .addCase(loginUserAsync.rejected, (state, action) => {
+        state.status = statusTypes.failed;
+        state.error = action.payload;
+      })
+      // logout user
+      .addCase(logOutUserAsync.pending, (state) => {
+        state.status = statusTypes.loading;
+      })
+      .addCase(logOutUserAsync.fulfilled, (state, action) => {
+        state.status = statusTypes.succeeded;
+        state.currentUser = {};
+        state.isLoggedIn = false;
+      })
+      .addCase(logOutUserAsync.rejected, (state, action) => {
+        state.status = statusTypes.failed;
+        state.error = action.payload;
+      })
+      // send verification
+      .addCase(sendVerificationOtpAsync.pending, (state) => {
+        state.status = statusTypes.loading;
+      })
+      .addCase(sendVerificationOtpAsync.fulfilled, (state) => {
+        state.status = statusTypes.succeeded;
+      })
+      .addCase(sendVerificationOtpAsync.rejected, (state, action) => {
         state.status = statusTypes.failed;
         state.error = action.payload;
       });

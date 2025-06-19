@@ -28,6 +28,16 @@ export const loginUserWithEmailAndPassword = async (email, password) => {
 };
 
 export const getUserData = async () => {
-  const { data } = await api.get("/api/user/data", { userId: "" });
+  const { data } = await api.get("/api/user/data");
   return data.userData;
+};
+
+export const logoutUser = async () => {
+  const { data } = await api.post("/api/auth/logout", {});
+  return data;
+};
+
+export const sendVerificationOtp = async () => {
+  const { data } = await api.post("/api/auth/send-verification-otp");
+  return data;
 };

@@ -41,10 +41,10 @@ const Form = ({ state, changeStateType }) => {
   };
 
   // Register user in firebase on form submit
-  const { status, error, register, login } = useAuth();
+  const { status, error, register, login, isLoggedIn } = useAuth();
 
   useEffect(() => {
-    if (status === statusTypes.succeeded) {
+    if (status === statusTypes.succeeded && isLoggedIn) {
       setFormInputs(defaultFormInputs);
       navigate("/");
     }
