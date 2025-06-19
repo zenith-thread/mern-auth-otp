@@ -10,9 +10,16 @@ const EmailVerify = lazy(() => import("./pages/EmailVerify"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import Loading from "./pages/Loading";
 
+// Toast notifs
+import { ToastContainer } from "react-toastify";
+
+import { store } from "./store/store";
+
 const App = () => {
+  store.dispatch({ type: "@@CHECK/LOGGER" });
   return (
     <Suspense fallback={<Loading />}>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

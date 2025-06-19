@@ -2,7 +2,7 @@ import userModel from "../../models/userModel.js";
 
 export const getUserData = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req;
 
     if (!userId) {
       return res.status(400).json({
@@ -27,6 +27,7 @@ export const getUserData = async (req, res) => {
       userData: { _id, name, email, isAccountVerified },
     });
   } catch (err) {
+    console.error("🔥 getUserData controller error:", err);
     res.status(500).json({
       success: false,
       message: err.message,

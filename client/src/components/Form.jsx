@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 // assets
 import { assets } from "../assets/assets";
@@ -7,37 +8,72 @@ import { assets } from "../assets/assets";
 import Button from "./Button";
 import FormInput from "./FormInput";
 
+// custom component
+import { useAuth } from "../customHooks/useAuth";
+
 const defaultFormInputs = {
-  full_name: "",
+  name: "",
   email: "",
   password: "",
 };
 
 import { STATE_TYPES } from "../pages/Login";
+import { statusTypes } from "../store/user/user.reducer";
+import { toast } from "react-toastify";
 
 const { person_icon, mail_icon, lock_icon } = assets;
 
 const Form = ({ state, changeStateType }) => {
+  // Form State
   const [formInputs, setFormInputs] = useState(defaultFormInputs);
-
-  const { full_name, email, password } = formInputs;
+  const { name, email, password } = formInputs;
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
 
     setFormInputs({ ...formInputs, [name]: value });
   };
+
+  // Navigation
+  const navigate = useNavigate();
+  const forgotPasswordHandler = () => {
+    navigate("/reset-password");
+  };
+
+  // Register user in firebase on form submit
+  const { status, error, register, login } = useAuth();
+
+  useEffect(() => {
+    if (status === statusTypes.succeeded) {
+      setFormInputs(defaultFormInputs);
+      navigate("/");
+    }
+    if (status === statusTypes.failed) {
+      toast.error(error);
+    }
+  }, [status, error, navigate]);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    console.log("▶️ submitting formInputs:", formInputs);
+    if (state === STATE_TYPES.sign_up) {
+      register(name, email, password);
+    } else {
+      login(email, password);
+    }
+  };
+
   return (
     <>
-      <form>
+      <form onSubmit={submitHandler}>
         {state === STATE_TYPES.sign_up && (
           <FormInput
             icon={person_icon}
             alt="person-icon"
             type="text"
             placeholder="Full Name"
-            name="full_name"
-            value={full_name}
+            name="name"
+            value={name}
             onChangeHandler={onChangeHandler}
           />
         )}
@@ -61,12 +97,17 @@ const Form = ({ state, changeStateType }) => {
           onChangeHandler={onChangeHandler}
         />
         {state === STATE_TYPES.log_in && (
-          <p className="mb-4 cursor-pointer hover:text-indigo-500">
+          <p
+            onClick={forgotPasswordHandler}
+            className="mb-4 cursor-pointer hover:text-indigo-500"
+          >
             Forgot Password?
           </p>
         )}
 
-        <Button className="form-btn">{state}</Button>
+        <Button type="submit" className="form-btn">
+          {state}
+        </Button>
       </form>
 
       {state === STATE_TYPES.sign_up ? (

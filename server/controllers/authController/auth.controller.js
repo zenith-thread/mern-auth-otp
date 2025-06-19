@@ -51,6 +51,7 @@ export const register = async (req, res) => {
       .status(201)
       .json({ success: true, message: "User created in the database." });
   } catch (err) {
+    console.error("🔥 register controller error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

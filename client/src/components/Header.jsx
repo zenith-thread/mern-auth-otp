@@ -1,3 +1,6 @@
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../store/user/user.selector";
+
 // assets
 import { assets } from "../assets/assets";
 
@@ -7,6 +10,8 @@ import Button from "./Button";
 const { header_img, hand_wave } = assets;
 
 const Header = () => {
+  const { name } = useSelector(selectCurrentUser);
+
   return (
     <header className="flex flex-col items-center mt-20 px-4 text-center text-gray-800">
       <img
@@ -15,7 +20,9 @@ const Header = () => {
         className="w-36 h-36 rounded-full mb-6"
       />
       <div className="flex items-center gap-2 mb-2">
-        <h1 className="text-xl sm:text-3xl font-medium">Hey Developer</h1>
+        <h1 className="text-xl sm:text-3xl font-medium">
+          Hey {name ? name : "Developer"}
+        </h1>
         <img src={hand_wave} alt="wave-img" className="w-8 aspect-square" />
       </div>
       <h2 className="text-3xl sm:text-5xl font-semibold mb-4">

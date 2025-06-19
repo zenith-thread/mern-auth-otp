@@ -1,5 +1,9 @@
-const Button = ({ className, children }) => {
-  return <button className={`${className && className}`}>{children}</button>;
+const Button = ({ type, className, children }) => {
+  return (
+    <button type={type} className={`${className && className}`}>
+      {children}
+    </button>
+  );
 };
 
 export default Button;
