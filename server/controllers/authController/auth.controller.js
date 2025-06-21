@@ -153,7 +153,10 @@ export const sendVerficationOtp = async (req, res) => {
     await user.save();
 
     const mailOptions = sendOtpEmail(user.email, otp, OTP_TYPES.verify);
+
+    console.log("About to send mailOptions:", mailOptions);
     await transporter.sendMail(mailOptions);
+    console.log("Mail sent, sending response");
 
     res.json({
       success: true,

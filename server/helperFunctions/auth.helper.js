@@ -1,5 +1,11 @@
 import jwt from "jsonwebtoken";
 
+// Email Templates
+import {
+  EMAIL_VERIFY_TEMPLATE,
+  PASSWORD_RESET_TEMPLATE,
+} from "../config/emailTemplates.js";
+
 export const generateJwtToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
@@ -33,11 +39,16 @@ export const sendOtpEmail = (email, otp, otpType) => ({
       ? "Account Verification OTP"
       : "Password Reset OTP"
   }`,
-  text: `Your OTP is ${otp}. ${
+  html:
     otpType === OTP_TYPES.verify
-      ? "Verify your account using this OTP"
-      : "Use this OTP to proceed with resetting your password"
-  }`,
+      ? EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
+          "{{email}}",
+          email
+        )
+      : PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace(
+          "{{email}}",
+          email
+        ),
 });
 // Generates a 6-digit random OTP number
 export const generateOTP = () =>
