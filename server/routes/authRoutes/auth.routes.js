@@ -10,6 +10,7 @@ import {
   isAuthenticated,
   sendResetOtp,
   resetPassword,
+  verifyResetOtp,
 } from "../../controllers/authController/auth.controller.js";
 
 // middleware
@@ -28,6 +29,7 @@ authRouter.post("/verify-user", userAuth, verifyUser);
 authRouter.get("/is-auth", userAuth, isAuthenticated);
 
 authRouter.post("/send-reset-otp", sendResetOtp);
+authRouter.post("/verify-reset-otp", verifyResetOtp);
 authRouter.post("/reset-password", resetPassword);
 
 export default authRouter;

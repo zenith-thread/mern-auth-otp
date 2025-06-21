@@ -171,7 +171,15 @@ export const sendVerficationOtp = async (req, res) => {
 // verify the email using OTP
 export const verifyUser = async (req, res) => {
   try {
-    const { otp, userId } = req.body;
+    const { otp } = req.body;
+    const { userId } = req;
+
+    console.log(
+      "VERIFY USER CONTROLLER\n\nWhat am i getting in the request body: ",
+      req.body
+    );
+    console.log("\nam i getting userId in the request?: ", userId);
+
     const user = await userModel.findById(userId);
 
     // userid or email is missing
@@ -226,6 +234,7 @@ export const verifyUser = async (req, res) => {
       message: "Email Verified Successfully",
     });
   } catch (err) {
+    console.error("verifyUser controller error: ", err);
     res.status(500).json({
       success: false,
       message: err.message,
@@ -282,6 +291,64 @@ export const sendResetOtp = async (req, res) => {
       message: "Reset OTP sent to user's email",
     });
   } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+// verify Reset Otp
+export const verifyResetOtp = async (req, res) => {
+  try {
+    const { otp, email } = req.body;
+
+    console.log(
+      "VERIFY RESET OTP USER CONTROLLER\n\nWhat am i getting in the request body: ",
+      req.body
+    );
+
+    const user = await userModel.findOne({ email });
+
+    // userid or email is missing
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email or OTP is missing",
+      });
+    }
+
+    // user doesn't exist
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User with the provided ID doesn't exist.",
+      });
+    }
+
+    // provided otp doesn't match the one stored in the user's document in database.
+    if (user.resetOtp === "" || user.resetOtp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    // otp is expired
+    if (user.resetOtpExpireAt < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP Expired",
+      });
+    }
+
+    // otp correct
+    res.json({
+      success: true,
+      message: "Reset OTP is correct",
+    });
+  } catch (err) {
+    console.error("verifyResetOtp controller error: ", err);
     res.status(500).json({
       success: false,
       message: err.message,

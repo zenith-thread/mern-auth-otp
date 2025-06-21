@@ -1,80 +1,18 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-// Api functions
+import { INITIAL_STATE } from "./user.state";
+
+// Async Thunks functions
 import {
-  registerUserInDatabase,
-  loginUserWithEmailAndPassword,
-  getUserData,
-  logoutUser,
-  sendVerificationOtp,
-} from "../../api/auth";
-
-export const statusTypes = {
-  idle: "idle",
-  loading: "loading",
-  succeeded: "succeeded",
-  failed: "failed",
-};
-
-const INITIAL_STATE = {
-  isLoggedIn: false,
-  currentUser: null,
-  status: statusTypes.idle, // "idle" | "loading" | "succeeded" | "failed"
-  error: null,
-};
-
-export const registerUserAsync = createAsyncThunk(
-  "user/registerUser",
-  async ({ name, email, password }, { rejectWithValue }) => {
-    try {
-      const { success } = await registerUserInDatabase(name, email, password);
-      if (success) {
-        const user = await getUserData();
-        return user;
-      }
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
-  }
-);
-
-export const loginUserAsync = createAsyncThunk(
-  "user/loginUser",
-  async ({ email, password }, { rejectWithValue }) => {
-    try {
-      const { success } = await loginUserWithEmailAndPassword(email, password);
-      if (success) {
-        const user = await getUserData();
-        return user;
-      }
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
-  }
-);
-
-export const logOutUserAsync = createAsyncThunk(
-  "user/logoutUser",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { success } = await logoutUser();
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
-  }
-);
-
-export const sendVerificationOtpAsync = createAsyncThunk(
-  "user/verificationOtp",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { message } = await sendVerificationOtp();
-      return message;
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
-  }
-);
+  registerUserAsync,
+  loginUserAsync,
+  logOutUserAsync,
+  sendVerificationOtpAsync,
+  verifyUserAsync,
+  sendResetPasswordOtpAsync,
+  resetPasswordAsync,
+  verifyResetOtpAsync,
+} from "./user.asyncThunks";
 
 export const userSlice = createSlice({
   name: "user",
@@ -88,53 +26,113 @@ export const userSlice = createSlice({
     builder
       // register user in database
       .addCase(registerUserAsync.pending, (state) => {
-        state.status = statusTypes.loading;
+        state.loading.register = true;
       })
       .addCase(registerUserAsync.fulfilled, (state, action) => {
-        state.status = statusTypes.succeeded;
+        state.loading.register = false;
+        state.success.register = true;
         state.isLoggedIn = true;
         state.currentUser = action.payload;
       })
       .addCase(registerUserAsync.rejected, (state, action) => {
-        state.status = statusTypes.failed;
-        state.error = action.payload;
+        state.loading.register = false;
+        state.error.register = true;
+        state.errorMessage = action.payload;
       })
       // login user
       .addCase(loginUserAsync.pending, (state) => {
-        state.status = statusTypes.loading;
+        state.loading.login = true;
       })
       .addCase(loginUserAsync.fulfilled, (state, action) => {
-        state.status = statusTypes.succeeded;
+        state.loading.login = false;
+        state.success.login = true;
         state.isLoggedIn = true;
         state.currentUser = action.payload;
       })
       .addCase(loginUserAsync.rejected, (state, action) => {
-        state.status = statusTypes.failed;
-        state.error = action.payload;
+        state.loading.login = false;
+        state.error.login = true;
+        state.errorMessage = action.payload;
       })
       // logout user
       .addCase(logOutUserAsync.pending, (state) => {
-        state.status = statusTypes.loading;
+        state.loading.logout = true;
       })
-      .addCase(logOutUserAsync.fulfilled, (state, action) => {
-        state.status = statusTypes.succeeded;
-        state.currentUser = {};
+      .addCase(logOutUserAsync.fulfilled, (state) => {
+        state.loading.logout = false;
+        state.success.logout = true;
+        state.currentUser = null;
         state.isLoggedIn = false;
       })
       .addCase(logOutUserAsync.rejected, (state, action) => {
-        state.status = statusTypes.failed;
-        state.error = action.payload;
+        state.loading.logout = false;
+        state.error.logout = true;
+        state.errorMessage = action.payload;
       })
-      // send verification
+      // send verification otp
       .addCase(sendVerificationOtpAsync.pending, (state) => {
-        state.status = statusTypes.loading;
+        state.loading.sendVerifyOtp = true;
       })
       .addCase(sendVerificationOtpAsync.fulfilled, (state) => {
-        state.status = statusTypes.succeeded;
+        state.loading.sendVerifyOtp = false;
+        state.success.sendVerifyOtp = true;
       })
       .addCase(sendVerificationOtpAsync.rejected, (state, action) => {
-        state.status = statusTypes.failed;
-        state.error = action.payload;
+        state.loading.sendVerifyOtp = false;
+        state.error.sendVerifyOtp = true;
+        state.errorMessage = action.payload;
+      })
+      // verify user
+      .addCase(verifyUserAsync.pending, (state) => {
+        state.loading.verifyUser = true;
+      })
+      .addCase(verifyUserAsync.fulfilled, (state) => {
+        state.loading.verifyUser = false;
+        state.success.verifyUser = true;
+      })
+      .addCase(verifyUserAsync.rejected, (state, action) => {
+        state.loading.verifyUser = false;
+        state.error.verifyUser = true;
+        state.errorMessage = action.payload;
+      })
+      // send reset password otp
+      .addCase(sendResetPasswordOtpAsync.pending, (state) => {
+        state.loading.sendResetOtp = true;
+      })
+      .addCase(sendResetPasswordOtpAsync.fulfilled, (state) => {
+        state.loading.sendResetOtp = false;
+        state.success.sendResetOtp = true;
+      })
+      .addCase(sendResetPasswordOtpAsync.rejected, (state, action) => {
+        state.loading.sendResetOtp = false;
+        state.error.sendResetOtp = true;
+        state.errorMessage = action.payload;
+      })
+      // verify reset otp
+      .addCase(verifyResetOtpAsync.pending, (state) => {
+        state.loading.verifyResetOtp = true;
+      })
+      .addCase(verifyResetOtpAsync.fulfilled, (state) => {
+        state.loading.verifyResetOtp = false;
+        state.success.verifyResetOtp = true;
+      })
+      .addCase(verifyResetOtpAsync.rejected, (state, action) => {
+        state.loading.verifyResetOtp = false;
+        state.error.verifyResetOtp = true;
+        state.errorMessage = action.payload;
+      })
+      // reset password
+      .addCase(resetPasswordAsync.pending, (state) => {
+        state.loading.resetPassword = true;
+      })
+      .addCase(resetPasswordAsync.fulfilled, (state) => {
+        state.loading.resetPassword = false;
+        state.success.resetPassword = true;
+      })
+      .addCase(resetPasswordAsync.rejected, (state, action) => {
+        state.loading.resetPassword = false;
+        state.success.resetPassword = true;
+        state.errorMessage = action.payload;
       });
   },
 });

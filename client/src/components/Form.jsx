@@ -18,7 +18,6 @@ const defaultFormInputs = {
 };
 
 import { STATE_TYPES } from "../pages/Login";
-import { statusTypes } from "../store/user/user.reducer";
 import { toast } from "react-toastify";
 
 const { person_icon, mail_icon, lock_icon } = assets;
@@ -36,22 +35,33 @@ const Form = ({ state, changeStateType }) => {
 
   // Navigation
   const navigate = useNavigate();
-  const forgotPasswordHandler = () => {
-    navigate("/reset-password");
-  };
+  const forgotPasswordHandler = () => navigate("/reset-password");
 
   // Register user in firebase on form submit
-  const { status, error, register, login, isLoggedIn } = useAuth();
+  const {
+    isLoggedIn,
+    registerSuccess,
+    registerError,
+    loginSuccess,
+    loginError,
+    errMessage,
+    register,
+    login,
+  } = useAuth();
 
   useEffect(() => {
-    if (status === statusTypes.succeeded && isLoggedIn) {
+    if ((registerSuccess && isLoggedIn) || (loginSuccess && isLoggedIn)) {
       setFormInputs(defaultFormInputs);
       navigate("/");
     }
-    if (status === statusTypes.failed) {
-      toast.error(error);
+    console.log("LOGIN ERROR FOR TOAST: ", loginError);
+    if (registerError) {
+      toast.error(errMessage);
     }
-  }, [status, error, navigate]);
+    if (loginError) {
+      toast.error(errMessage);
+    }
+  }, [registerSuccess, registerError, loginSuccess, loginError, navigate]);
 
   const submitHandler = (e) => {
     e.preventDefault();

@@ -1,7 +1,5 @@
 import axios from "axios";
 
-console.log("ENV BACKEND URL: ", import.meta.env.VITE_BACKEND_URL);
-
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   headers: {
@@ -38,6 +36,32 @@ export const logoutUser = async () => {
 };
 
 export const sendVerificationOtp = async () => {
-  const { data } = await api.post("/api/auth/send-verification-otp");
+  const { data } = await api.post("/api/auth/send-verification-otp", {});
+  return data;
+};
+
+export const verifyUser = async (otp) => {
+  console.log("Recieved otp in this format: ", otp);
+  const { data } = await api.post("/api/auth/verify-user", { otp });
+  return data;
+};
+
+export const sendResetPasswordOtp = async (email) => {
+  const { data } = await api.post("/api/auth/send-reset-otp", { email });
+  return data;
+};
+
+export const verifyResetOtp = async (email, otp) => {
+  const { data } = await api.post("/api/auth/verify-reset-otp", { email, otp });
+  return data;
+};
+
+export const resetPassword = async (email, newPassword, otp) => {
+  console.log("AM I SENDING PROPER DATA?: ", email, newPassword, otp);
+  const { data } = await api.post("/api/auth/reset-password", {
+    email,
+    newPassword,
+    otp,
+  });
   return data;
 };

@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 // assets
 import { assets } from "../assets/assets";
 
-import { statusTypes } from "../store/user/user.reducer";
-
 // React Router
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 // components
 import Button from "./Button";
@@ -18,18 +16,31 @@ const { logo, arrow_icon } = assets;
 
 const Navbar = () => {
   const [dropdown, setDropdown] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdown(!dropdown);
   };
 
-  const { isLoggedIn, currentUser, logout, status, error } = useAuth();
+  const {
+    isLoggedIn,
+    currentUser,
+    sendVerifyOtpSuccess,
+    sendVerifyOtpError,
+    logout,
+    sendVerificationOtp,
+  } = useAuth();
 
-  useEffect(() => {
-    if (status === statusTypes.failed) {
-      toast.error(error);
-    }
-  }, [status, error]);
+  // useEffect(() => {
+  //   if (status === statusTypes.failed) {
+  //     toast.error(error);
+  //   }
+  // }, [status, error]);
+
+  const verificationHandler = () => {
+    sendVerificationOtp();
+    navigate("/email-verify");
+  };
 
   return (
     <div className="w-full flex justify-between items-center p-4 sm:p-6 sm:px-6  absolute top-0">
@@ -48,7 +59,10 @@ const Navbar = () => {
             <div className="absolute right-0 mt-2 bg-white shadow-md rounded-xl z-10 text-black w-40">
               <ul className="flex flex-col items-center py-2 ">
                 {!currentUser.isAccountVerified && (
-                  <li className="px-4 py-2 hover:bg-gray-100 rounded-xl cursor-pointer w-36">
+                  <li
+                    onClick={verificationHandler}
+                    className="px-4 py-2 hover:bg-gray-100 rounded-xl cursor-pointer w-36"
+                  >
                     Verify Email
                   </li>
                 )}

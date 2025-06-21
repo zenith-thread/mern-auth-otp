@@ -14,9 +14,9 @@ export const generateTokenInCookie = (res, token) =>
   });
 
 export const sendWelcomeEmail = (email) => ({
-  from: process.env.BREVO_SENDER_EMAIL,
+  from: process.env.SENDGRID_SENDER_EMAIL,
   to: email,
-  subject: "Welcome to Zenith authentication system",
+  subject: "Welcome to MERN Auth System",
   text: `Welcome to Zenith authentication system. Your account has been successfully been created with email id: ${email}`,
 });
 
@@ -26,7 +26,7 @@ export const OTP_TYPES = {
 };
 
 export const sendOtpEmail = (email, otp, otpType) => ({
-  from: process.env.BREVO_SENDER_EMAIL,
+  from: process.env.SENDGRID_SENDER_EMAIL,
   to: email,
   subject: `${
     otpType === OTP_TYPES.verify
